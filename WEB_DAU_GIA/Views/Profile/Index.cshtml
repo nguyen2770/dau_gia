@@ -1,0 +1,335 @@
+﻿@using WEB_DAU_GIA.Models.ViewModels
+@model ProfileViewModel
+
+@{
+    ViewData["Title"] = "Hồ sơ cá nhân";
+    Layout = "_DashboardLayout";
+}
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Header -->
+            <div class="mb-4">
+                <h2 class="fw-bold mb-1">
+                    <i class="fas fa-user-circle me-2"></i>Hồ sơ cá nhân
+                </h2>
+                <p class="text-secondary mb-0">Quản lý thông tin tài khoản của bạn</p>
+            </div>
+
+            <!-- Alert Messages -->
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <div class="row g-4">
+                <!-- Left Column - Profile Info -->
+                <div class="col-lg-4">
+                    <!-- Avatar Card -->
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body text-center">
+                            <div class="avatar-container mb-3">
+                                <img src="https://ui-avatars.com/api/?name=@Model.FirstName+@Model.LastName&size=150&background=0d6efd&color=fff"
+                                     class="rounded-circle mb-3"
+                                     alt="Avatar"
+                                     style="width: 150px; height: 150px;">
+                            </div>
+                            <h4 class="fw-bold mb-1">@Model.FirstName @Model.LastName</h4>
+                            <p class="text-muted mb-3">@@@Model.Username</p>
+
+                            <div class="d-flex justify-content-center gap-2">
+                                <span class="badge bg-primary">
+                                    <i class="fas fa-gavel me-1"></i>@Model.TotalAuctions Đấu giá
+                                </span>
+                                <span class="badge bg-success">
+                                    <i class="fas fa-trophy me-1"></i>@Model.WonAuctions Thắng
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stats Card -->
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white border-bottom">
+                            <h5 class="mb-0 fw-bold">
+                                <i class="fas fa-chart-bar me-2"></i>Thống kê
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
+                                <span class="text-muted">Tổng giá thầu:</span>
+                                <strong>@Model.TotalBids</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
+                                <span class="text-muted">Đã chi tiêu:</span>
+                                <strong class="text-success">$@Model.TotalSpent.ToString("N0")</strong>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Thành viên từ:</span>
+                                <strong>@Model.MemberSince.ToString("dd/MM/yyyy")</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column - Edit Form -->
+                <div class="col-lg-8">
+                    <form asp-action="Update" asp-controller="Profile" method="post" id="profileForm">
+                        @Html.AntiForgeryToken()
+
+                        <!-- Personal Information Card -->
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-header bg-white border-bottom">
+                                <h5 class="mb-0 fw-bold">
+                                    <i class="fas fa-user me-2"></i>Thông tin cá nhân
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <!-- First Name -->
+                                    <div class="col-md-6">
+                                        <label asp-for="FirstName" class="form-label fw-semibold">
+                                            Họ <span class="text-danger">*</span>
+                                        </label>
+                                        <input asp-for="FirstName" class="form-control" placeholder="Nhập họ">
+                                        <span asp-validation-for="FirstName" class="text-danger small"></span>
+                                    </div>
+
+                                    <!-- Last Name -->
+                                    <div class="col-md-6">
+                                        <label asp-for="LastName" class="form-label fw-semibold">
+                                            Tên <span class="text-danger">*</span>
+                                        </label>
+                                        <input asp-for="LastName" class="form-control" placeholder="Nhập tên">
+                                        <span asp-validation-for="LastName" class="text-danger small"></span>
+                                    </div>
+
+                                    <!-- Gender -->
+                                    <div class="col-md-6">
+                                        <label asp-for="Gender" class="form-label fw-semibold">
+                                            Giới tính <span class="text-danger">*</span>
+                                        </label>
+                                        <select asp-for="Gender" class="form-select">
+                                            <option value="">Chọn giới tính</option>
+                                            <option value="male">Nam</option>
+                                            <option value="female">Nữ</option>
+                                            <option value="other">Khác</option>
+                                        </select>
+                                        <span asp-validation-for="Gender" class="text-danger small"></span>
+                                    </div>
+
+                                    <!-- Mobile -->
+                                    <div class="col-md-6">
+                                        <label asp-for="Mobile" class="form-label fw-semibold">
+                                            Số điện thoại <span class="text-danger">*</span>
+                                        </label>
+                                        <input asp-for="Mobile" type="tel" class="form-control" placeholder="0123456789">
+                                        <span asp-validation-for="Mobile" class="text-danger small"></span>
+                                    </div>
+
+                                    <!-- Address -->
+                                    <div class="col-12">
+                                        <label asp-for="Address" class="form-label fw-semibold">
+                                            Địa chỉ <span class="text-danger">*</span>
+                                        </label>
+                                        <textarea asp-for="Address" class="form-control" rows="2" placeholder="Nhập địa chỉ đầy đủ"></textarea>
+                                        <span asp-validation-for="Address" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Account Information Card -->
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-header bg-white border-bottom">
+                                <h5 class="mb-0 fw-bold">
+                                    <i class="fas fa-envelope me-2"></i>Thông tin tài khoản
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <!-- Email -->
+                                    <div class="col-md-6">
+                                        <label asp-for="Email" class="form-label fw-semibold">
+                                            Email <span class="text-danger">*</span>
+                                        </label>
+                                        <input asp-for="Email" type="email" class="form-control" placeholder="example@email.com">
+                                        <span asp-validation-for="Email" class="text-danger small"></span>
+                                    </div>
+
+                                    <!-- Username (readonly) -->
+                                    <div class="col-md-6">
+                                        <label asp-for="Username" class="form-label fw-semibold">
+                                            Tên đăng nhập
+                                        </label>
+                                        <input asp-for="Username" class="form-control" readonly>
+                                        <small class="text-muted">Tên đăng nhập không thể thay đổi</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-success btn-lg" id="saveBtn">
+                                        <i class="fas fa-save me-2"></i>Lưu thay đổi
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary btn-lg" id="resetBtn">
+                                        <i class="fas fa-undo me-2"></i>Đặt lại
+                                    </button>
+                                    <button type="button" class="btn btn-outline-warning btn-lg ms-auto" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                                        <i class="fas fa-key me-2"></i>Đổi mật khẩu
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-key me-2"></i>Đổi mật khẩu
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-action="ChangePassword" asp-controller="Profile" method="post" id="changePasswordForm">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Mật khẩu hiện tại</label>
+                        <input type="password" name="CurrentPassword" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Mật khẩu mới</label>
+                        <input type="password" name="NewPassword" class="form-control" minlength="6" required>
+                        <small class="text-muted">Tối thiểu 6 ký tự</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Xác nhận mật khẩu mới</label>
+                        <input type="password" name="ConfirmPassword" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-check me-2"></i>Đổi mật khẩu
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Original form data for reset
+        const originalData = {
+            firstName: '@Model.FirstName',
+            lastName: '@Model.LastName',
+            gender: '@Model.Gender',
+            mobile: '@Model.Mobile',
+            address: '@Model.Address',
+            email: '@Model.Email'
+        };
+
+        // Reset form
+        document.getElementById('resetBtn').addEventListener('click', function() {
+            if (!confirm('Bạn có chắc muốn đặt lại thay đổi?')) return;
+
+            document.querySelector('input[name="FirstName"]').value = originalData.firstName;
+            document.querySelector('input[name="LastName"]').value = originalData.lastName;
+            document.querySelector('select[name="Gender"]').value = originalData.gender;
+            document.querySelector('input[name="Mobile"]').value = originalData.mobile;
+            document.querySelector('textarea[name="Address"]').value = originalData.address;
+            document.querySelector('input[name="Email"]').value = originalData.email;
+
+            showToast('Đã đặt lại thông tin', 'info');
+        });
+
+        // Form submission
+        document.getElementById('profileForm').addEventListener('submit', function(e) {
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Đang lưu...';
+        });
+
+        // Change password form validation
+        document.getElementById('changePasswordForm').addEventListener('submit', function(e) {
+            const newPassword = this.querySelector('input[name="NewPassword"]').value;
+            const confirmPassword = this.querySelector('input[name="ConfirmPassword"]').value;
+
+            if (newPassword !== confirmPassword) {
+                e.preventDefault();
+                alert('Mật khẩu xác nhận không khớp!');
+                return false;
+            }
+        });
+
+        // Toast notification
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type} position-fixed top-0 end-0 m-3`;
+            toast.style.zIndex = '9999';
+            toast.innerHTML = `
+                <i class="fas fa-info-circle me-2"></i>
+                ${message}
+            `;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Phone number formatting
+        document.querySelector('input[name="Mobile"]').addEventListener('input', function(e) {
+            this.value = this.value.replace(/\D/g, '').substring(0, 10);
+        });
+    </script>
+
+    <style>
+        .avatar-container {
+            position: relative;
+            display: inline-block;
+        }
+
+            .avatar-container:hover {
+                opacity: 0.9;
+                cursor: pointer;
+            }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        }
+    </style>
+}

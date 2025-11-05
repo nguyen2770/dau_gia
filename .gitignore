@@ -1,0 +1,47 @@
+# Build results
+bin/
+obj/
+wwwroot/lib/
+wwwroot/dist/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio
+.vs/
+.vscode/
+*.code-workspace
+
+# Logs
+*.log
+*.tlog
+
+# Environment settings
+appsettings.Development.json
+appsettings.Local.json
+
+# Dependency directories
+node_modules/
+packages/
+
+# Backup & temp files
+*.bak
+*.tmp
+*.temp
+*.pidb
+*.svclog
+
+# Publish output
+publish/
+out/
+
+# JetBrains Rider
+.idea/
+
+# Other
+Thumbs.db
+Desktop.ini
+config.bat

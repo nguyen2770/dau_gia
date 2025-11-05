@@ -1,0 +1,284 @@
+﻿@using WEB_DAU_GIA.Models.ViewModels
+@model NotificationViewModel
+
+@{
+    ViewData["Title"] = "Thông báo";
+    Layout = "_DashboardLayout";
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">
+                <i class="fas fa-bell me-2"></i>Thông báo
+            </h2>
+            <p class="text-secondary mb-0">
+                Bạn có <strong>@Model.UnreadCount</strong> thông báo chưa đọc
+            </p>
+        </div>
+        @if (Model.UnreadCount > 0)
+        {
+            <button class="btn btn-outline-primary" id="markAllReadBtn">
+                <i class="fas fa-check-double me-2"></i>Đánh dấu tất cả đã đọc
+            </button>
+        }
+    </div>
+
+    <!-- New Notifications -->
+    @if (Model.NewNotifications.Any())
+    {
+        <div class="mb-4">
+            <h5 class="fw-bold mb-3">
+                <i class="fas fa-star text-warning me-2"></i>Mới (@Model.NewNotifications.Count)
+            </h5>
+            @foreach (var notification in Model.NewNotifications)
+            {
+                <div class="card border-0 shadow-sm mb-2 notification-card new-notification"
+                     data-id="@notification.NotificationId">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start">
+                            <div class="flex-shrink-0 me-3">
+                                <div class="notification-icon bg-primary bg-opacity-10 rounded-circle p-3">
+                                    <i class="fas @GetNotificationIcon(notification.Title) fa-lg text-primary"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="fw-bold mb-0">@notification.Title</h6>
+                                    <span class="badge bg-primary">Mới</span>
+                                </div>
+                                <p class="text-secondary mb-2">@notification.Message</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>
+                                        @GetTimeAgo(notification.CreatedAt)
+                                    </small>
+                                    <div>
+                                        <a href="@notification.Link" class="btn btn-sm btn-outline-primary me-2">
+                                            <i class="fas fa-eye me-1"></i>Xem
+                                        </a>
+                                        <button class="btn btn-sm btn-outline-secondary mark-read-btn"
+                                                data-id="@notification.NotificationId">
+                                            <i class="fas fa-check me-1"></i>Đánh dấu đã đọc
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <!-- Older Notifications -->
+    @if (Model.OlderNotifications.Any())
+    {
+        <div class="mb-4">
+            <h5 class="fw-bold mb-3">
+                <i class="fas fa-history me-2"></i>Cũ hơn (@Model.OlderNotifications.Count)
+            </h5>
+            @foreach (var notification in Model.OlderNotifications)
+            {
+                <div class="card border-0 shadow-sm mb-2 notification-card"
+                     data-id="@notification.NotificationId">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start">
+                            <div class="flex-shrink-0 me-3">
+                                <div class="notification-icon bg-secondary bg-opacity-10 rounded-circle p-3">
+                                    <i class="fas @GetNotificationIcon(notification.Title) fa-lg text-secondary"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="fw-bold mb-2">@notification.Title</h6>
+                                <p class="text-secondary mb-2">@notification.Message</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>
+                                        @GetTimeAgo(notification.CreatedAt)
+                                    </small>
+                                    <a href="@notification.Link" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye me-1"></i>Xem chi tiết
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <!-- Empty State -->
+    @if (!Model.NewNotifications.Any() && !Model.OlderNotifications.Any())
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-bell-slash fa-4x text-secondary mb-3 opacity-25"></i>
+            <h4 class="text-secondary mb-3">Không có thông báo</h4>
+            <p class="text-muted">Bạn sẽ nhận được thông báo khi có hoạt động mới</p>
+        </div>
+    }
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;" id="toastContainer"></div>
+
+@section Scripts {
+    <script>
+        // Mark single notification as read
+        document.querySelectorAll('.mark-read-btn').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                const notificationId = parseInt(this.dataset.id);
+                await markAsRead(notificationId);
+            });
+        });
+
+        // Mark all as read
+        const markAllBtn = document.getElementById('markAllReadBtn');
+        if (markAllBtn) {
+            markAllBtn.addEventListener('click', async function() {
+                const confirmed = confirm('Đánh dấu tất cả thông báo là đã đọc?');
+                if (!confirmed) return;
+
+                this.disabled = true;
+                this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Đang xử lý...';
+
+                const newNotifications = document.querySelectorAll('.new-notification');
+                for (const card of newNotifications) {
+                    const id = parseInt(card.dataset.id);
+                    await markAsRead(id, false);
+                }
+
+                showToast('Đã đánh dấu tất cả là đã đọc', 'success');
+                setTimeout(() => location.reload(), 1000);
+            });
+        }
+
+        // Mark as read function
+        async function markAsRead(notificationId, reload = true) {
+            try {
+                const url = '@Url.Action("MarkAsRead", "Notification")';
+                const request = new Request(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ notificationId: notificationId })
+                });
+
+                const response = await fetch(request);
+                const result = await response.json();
+
+                if (result.success) {
+                    const card = document.querySelector(`[data-id="${notificationId}"]`);
+                    if (card) {
+                        card.style.transition = 'opacity 0.3s ease';
+                        card.style.opacity = '0';
+                        setTimeout(() => {
+                            if (reload) {
+                                location.reload();
+                            }
+                        }, 300);
+                    }
+                } else {
+                    showToast(result.message || 'Có lỗi xảy ra', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Có lỗi xảy ra', 'error');
+            }
+        }
+
+        // Toast notification
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0`;
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+
+            document.getElementById('toastContainer').appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+
+            setTimeout(() => toast.remove(), 5000);
+        }
+
+        // Card hover animation
+        document.querySelectorAll('.notification-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateX(5px)';
+                this.style.transition = 'transform 0.3s ease';
+            });
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateX(0)';
+            });
+        });
+
+        // Auto refresh every 30 seconds
+        setInterval(() => {
+            // Check for new notifications
+            fetch('@Url.Action("CheckNewNotifications", "Notification")')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.hasNew) {
+                        showToast('Bạn có thông báo mới!', 'success');
+                    }
+                });
+        }, 30000);
+    </script>
+
+    <style>
+        .notification-card {
+            transition: all 0.3s ease;
+        }
+
+            .notification-card:hover {
+                box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+            }
+
+        .new-notification {
+            background: linear-gradient(to right, rgba(13, 110, 253, 0.05), transparent);
+            border-left: 4px solid #0d6efd !important;
+        }
+
+        .notification-icon {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+}
+
+@functions {
+    string GetNotificationIcon(string title)
+    {
+        if (title.Contains("Giá thầu")) return "fa-gavel";
+        if (title.Contains("Thanh toán")) return "fa-money-bill";
+        if (title.Contains("Thắng") || title.Contains("Chiến thắng")) return "fa-trophy";
+        if (title.Contains("Đấu giá")) return "fa-bullhorn";
+        return "fa-bell";
+    }
+
+    string GetTimeAgo(DateTime createdAt)
+    {
+        var timeSpan = DateTime.UtcNow - createdAt;
+
+        if (timeSpan.TotalMinutes < 1) return "Vừa xong";
+        if (timeSpan.TotalMinutes < 60) return $"{(int)timeSpan.TotalMinutes} phút trước";
+        if (timeSpan.TotalHours < 24) return $"{(int)timeSpan.TotalHours} giờ trước";
+        if (timeSpan.TotalDays < 7) return $"{(int)timeSpan.TotalDays} ngày trước";
+
+        return createdAt.ToString("dd/MM/yyyy HH:mm");
+    }
+}

@@ -1,0 +1,275 @@
+﻿@using WEB_DAU_GIA.Models.Entities
+@model List<Auction>
+
+@{
+    ViewData["Title"] = "Danh sách đấu giá";
+    Layout = "_DashboardLayout";
+}
+
+<div class="container-fluid">
+    <!-- Search Bar -->
+    <div class="mb-4">
+        <input type="text"
+               id="searchInput"
+               class="form-control form-control-lg"
+               placeholder="Tìm kiếm theo tiêu đề hoặc mô tả...">
+    </div>
+
+    <!-- Filter Section -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title fw-bold mb-3">
+                <i class="fas fa-filter me-2"></i>Bộ lọc
+            </h5>
+            <div class="row g-3">
+                <!-- Starting Bid -->
+                <div class="col-lg-2 col-md-4 col-sm-6">
+                    <label for="startingBid" class="form-label small fw-semibold">Giá khởi điểm</label>
+                    <input type="number"
+                           id="startingBid"
+                           class="form-control"
+                           placeholder="VD: 100">
+                </div>
+
+                <!-- Start Time -->
+                <div class="col-lg-2 col-md-4 col-sm-6">
+                    <label for="startTime" class="form-label small fw-semibold">Ngày bắt đầu</label>
+                    <input type="date"
+                           id="startTime"
+                           class="form-control">
+                </div>
+
+                <!-- End Time -->
+                <div class="col-lg-2 col-md-4 col-sm-6">
+                    <label for="endTime" class="form-label small fw-semibold">Ngày kết thúc</label>
+                    <input type="date"
+                           id="endTime"
+                           class="form-control">
+                </div>
+
+                <!-- Status -->
+                <div class="col-lg-2 col-md-4 col-sm-6">
+                    <label for="status" class="form-label small fw-semibold">Trạng thái</label>
+                    <select id="status" class="form-select">
+                        <option value="">Tất cả</option>
+                        <option value="active">Đang hoạt động</option>
+                        <option value="closed">Đã đóng</option>
+                    </select>
+                </div>
+
+                <!-- Category -->
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <label for="category" class="form-label small fw-semibold">Danh mục</label>
+                    <select id="category" class="form-select">
+                        <option value="">Tất cả danh mục</option>
+                        <option value="Art and Antiques">Nghệ thuật & Đồ cổ</option>
+                        <option value="Fashion and Accessories">Thời trang & Phụ kiện</option>
+                        <option value="Home and Garden">Nhà cửa & Vườn</option>
+                        <option value="Electronics and Gadgets">Điện tử & Công nghệ</option>
+                        <option value="Vehicles">Phương tiện</option>
+                        <option value="Collectibles">Sưu tầm</option>
+                        <option value="Sports and Outdoors">Thể thao & Ngoài trời</option>
+                        <option value="Toys and Games">Đồ chơi & Trò chơi</option>
+                        <option value="Books and Media">Sách & Truyền thông</option>
+                        <option value="Photography">Nhiếp ảnh</option>
+                        <option value="Crafts and Hobbies">Thủ công & Sở thích</option>
+                        <option value="Real Estate">Bất động sản</option>
+                        <option value="Wine and Spirits">Rượu</option>
+                        <option value="Tickets and Experiences">Vé & Trải nghiệm</option>
+                        <option value="Health and Beauty">Sức khỏe & Làm đẹp</option>
+                    </select>
+                </div>
+
+                <!-- Reset Button -->
+                <div class="col-lg-1 col-md-12 d-flex align-items-end">
+                    <button id="resetBtn" class="btn btn-secondary w-100">
+                        <i class="fas fa-redo me-1"></i>Đặt lại
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Count -->
+    <div class="mb-3">
+        <p class="text-secondary mb-0">
+            Hiển thị <strong id="resultCount">@Model.Count</strong> kết quả
+        </p>
+    </div>
+
+    <!-- Auction Grid -->
+    <div class="row g-4" id="auctionGrid">
+        @foreach (var auction in Model)
+        {
+            <div class="col-lg-4 col-md-6 auction-item"
+                 data-title="@auction.Title.ToLower()"
+                 data-description="@auction.Description.ToLower()"
+                 data-starting-bid="@auction.StartingBid"
+                 data-start-time="@auction.StartTime.ToString("yyyy-MM-dd")"
+                 data-end-time="@auction.EndTime.ToString("yyyy-MM-dd")"
+                 data-status="@auction.Status"
+                 data-category="@auction.AuctionCategory">
+
+                <div class="card border-0 shadow-sm h-100 auction-card">
+                    <img src="@auction.AuctionImage"
+                         class="card-img-top auction-image"
+                         alt="@auction.Title"
+                         style="height: 200px; object-fit: cover;">
+
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title fw-bold mb-2">@auction.Title</h5>
+                        <p class="card-text text-secondary small mb-3 flex-grow-1">
+                            @(auction.Description.Length > 100 ? auction.Description.Substring(0, 100) + "..." : auction.Description)
+                        </p>
+
+                        <div class="mb-2">
+                            <span class="badge bg-light text-dark border me-2">
+                                <i class="fas fa-tag me-1"></i>@auction.AuctionCategory
+                            </span>
+                            <span class="badge bg-@(auction.Status == "active" ? "success" : "secondary")">
+                                @(auction.Status == "active" ? "Đang hoạt động" : "Đã đóng")
+                            </span>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <small class="text-muted d-block">Giá khởi điểm</small>
+                                <span class="h5 text-success fw-bold mb-0">$@auction.StartingBid</span>
+                            </div>
+                            @if (auction.CurrentBid > 0)
+                            {
+                                <div class="text-end">
+                                    <small class="text-muted d-block">Giá hiện tại</small>
+                                    <span class="h5 text-primary fw-bold mb-0">$@auction.CurrentBid</span>
+                                </div>
+                            }
+                        </div>
+
+                        <a href="@Url.Action("Details", "Auction", new { id = auction.AuctionId })"
+                           class="btn btn-primary w-100">
+                            <i class="fas fa-eye me-2"></i>Xem chi tiết
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- No Results Message -->
+    <div id="noResults" class="text-center py-5 d-none">
+        <i class="fas fa-search fa-3x text-secondary mb-3"></i>
+        <h4 class="text-secondary">Không tìm thấy kết quả</h4>
+        <p class="text-muted">Vui lòng thử lại với bộ lọc khác</p>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Get all auction items
+        const auctionItems = document.querySelectorAll('.auction-item');
+        const searchInput = document.getElementById('searchInput');
+        const startingBidInput = document.getElementById('startingBid');
+        const startTimeInput = document.getElementById('startTime');
+        const endTimeInput = document.getElementById('endTime');
+        const statusSelect = document.getElementById('status');
+        const categorySelect = document.getElementById('category');
+        const resetBtn = document.getElementById('resetBtn');
+        const noResults = document.getElementById('noResults');
+        const resultCount = document.getElementById('resultCount');
+
+        // Filter function
+        function filterAuctions() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const minBid = startingBidInput.value ? parseFloat(startingBidInput.value) : 0;
+            const startDate = startTimeInput.value;
+            const endDate = endTimeInput.value;
+            const statusValue = statusSelect.value;
+            const categoryValue = categorySelect.value;
+
+            let visibleCount = 0;
+
+            auctionItems.forEach(item => {
+                const title = item.dataset.title;
+                const description = item.dataset.description;
+                const bid = parseFloat(item.dataset.startingBid);
+                const itemStartDate = item.dataset.startTime;
+                const itemEndDate = item.dataset.endTime;
+                const status = item.dataset.status;
+                const category = item.dataset.category;
+
+                // Check all filter conditions
+                const matchesSearch = !searchTerm || title.includes(searchTerm) || description.includes(searchTerm);
+                const matchesBid = bid >= minBid;
+                const matchesStartDate = !startDate || itemStartDate >= startDate;
+                const matchesEndDate = !endDate || itemEndDate <= endDate;
+                const matchesStatus = !statusValue || status === statusValue;
+                const matchesCategory = !categoryValue || category === categoryValue;
+
+                if (matchesSearch && matchesBid && matchesStartDate && matchesEndDate && matchesStatus && matchesCategory) {
+                    item.style.display = '';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Update result count
+            resultCount.textContent = visibleCount;
+
+            // Show/hide no results message
+            if (visibleCount === 0) {
+                noResults.classList.remove('d-none');
+            } else {
+                noResults.classList.add('d-none');
+            }
+        }
+
+        // Add event listeners
+        searchInput.addEventListener('input', filterAuctions);
+        startingBidInput.addEventListener('input', filterAuctions);
+        startTimeInput.addEventListener('change', filterAuctions);
+        endTimeInput.addEventListener('change', filterAuctions);
+        statusSelect.addEventListener('change', filterAuctions);
+        categorySelect.addEventListener('change', filterAuctions);
+
+        // Reset filters
+        resetBtn.addEventListener('click', function() {
+            searchInput.value = '';
+            startingBidInput.value = '';
+            startTimeInput.value = '';
+            endTimeInput.value = '';
+            statusSelect.value = '';
+            categorySelect.value = '';
+            filterAuctions();
+        });
+
+        // Card hover animation
+        document.querySelectorAll('.auction-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+                this.style.transition = 'transform 0.3s ease';
+            });
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+
+    <style>
+        .auction-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .auction-card:hover {
+                box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+            }
+
+        .auction-image {
+            transition: transform 0.3s ease;
+        }
+
+        .auction-card:hover .auction-image {
+            transform: scale(1.05);
+        }
+    </style>
+}

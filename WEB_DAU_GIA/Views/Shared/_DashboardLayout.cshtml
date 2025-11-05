@@ -1,0 +1,182 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - BidOut Dashboard</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+
+    <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
+</head>
+<body class="dashboard-body">
+
+    <!-- Top Navigation Bar (Fixed) -->
+    <nav class="navbar navbar-light bg-light border-bottom border-primary border-3 fixed-top dashboard-navbar">
+        <div class="container-fluid px-4 d-flex justify-content-between align-items-center">
+            <!-- Page Title -->
+            <h1 class="h3 fw-bold mb-0 ms-3">@ViewData["Title"]</h1>
+
+            <!-- Sidebar Toggle Button (Mobile) -->
+            <button class="btn btn-outline-dark d-sm-none" type="button" id="sidebarToggle">
+                <span class="visually-hidden">Open sidebar</span>
+                Menu
+            </button>
+        </div>
+    </nav>
+
+
+    <!-- Sidebar -->
+    <aside class="sidebar bg-primary-dark text-white" id="sidebar">
+        <div class="sidebar-wrapper">
+            <!-- Logo Header -->
+            <div class="sidebar-header text-center p-4">
+                <div class="d-flex align-items-center justify-content-center">
+                    <div class="logo-dot bg-warning rounded-circle me-2"></div>
+                    <h2 class="h4 mb-0 fw-bold">
+                        <span class="text-warning">Bid</span><span class="text-white">Out</span>
+                    </h2>
+                </div>
+            </div>
+
+            <!-- Sidebar Content -->
+            <div class="sidebar-content px-3 pb-4">
+
+                <!-- General Section -->
+                <div class="mb-4">
+                    <h6 class="text-uppercase text-muted-light small fw-semibold mb-2 px-2">General</h6>
+                    <ul class="nav flex-column sidebar-nav">
+                        <li class="nav-item mb-2">
+                            <a class="nav-link sidebar-link d-flex align-items-center" href="@Url.Action("Index", "Dashboard")">
+                                <i class="fas fa-chart-simple me-2 sidebar-icon"></i>
+                                <span class="ms-3">Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a class="nav-link sidebar-link d-flex align-items-center" href="@Url.Action("Index", "Auction")">
+                                <i class="fas fa-cart-shopping me-2 sidebar-icon"></i>
+                                <span class="ms-3">Auctions</span>
+                            </a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a class="nav-link sidebar-link d-flex align-items-center position-relative" href="@Url.Action("Index", "Notification")">
+                                <i class="fas fa-bell me-2 sidebar-icon"></i>
+                                <span class="ms-3">Notifications</span>
+                                <span id="notificationBadge" class="badge bg-danger ms-2 d-none"></span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- My Activities Section -->
+                <div class="mb-4">
+                    <h6 class="text-uppercase text-muted-light small fw-semibold mb-2 px-2">My Activities</h6>
+                    <ul class="nav flex-column sidebar-nav">
+                        <li class="nav-item mb-2">
+                            <a class="nav-link sidebar-link d-flex align-items-center" href="@Url.Action("MyAuctions", "Auction")">
+                                <i class="fas fa-tags me-2 sidebar-icon"></i>
+                                <span class="ms-3">My Auctions</span>
+                            </a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a class="nav-link sidebar-link d-flex align-items-center" href="@Url.Action("MyBids", "Bid")">
+                                <i class="fas fa-gavel me-2 sidebar-icon"></i>
+                                <span class="ms-3">My Bids</span>
+                            </a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a class="nav-link sidebar-link d-flex align-items-center" href="@Url.Action("MyPayments", "Payment")">
+                                <i class="fas fa-money-bill me-2 sidebar-icon"></i>
+                                <span class="ms-3">My Payments</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Account Section -->
+                <div class="mb-4">
+                    <h6 class="text-uppercase text-muted-light small fw-semibold mb-2 px-2">Account</h6>
+                    <ul class="nav flex-column sidebar-nav">
+                        <li class="nav-item mb-2">
+                            <a class="nav-link sidebar-link d-flex align-items-center" href="@Url.Action("Index", "Profile")">
+                                <i class="fas fa-user me-2 sidebar-icon"></i>
+                                <span class="ms-3">Profile</span>
+                            </a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a class="nav-link sidebar-link d-flex align-items-center" href="@Url.Action("Logout", "Account")">
+                                <i class="fas fa-sign-out-alt me-2 sidebar-icon"></i>
+                                <span class="ms-3">Logout</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <div class="container-fluid p-4 pt-5">
+            @RenderBody()
+        </div>
+    </main>
+
+    <!-- Bootstrap 5 JS từ lib -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/dashboard.js" asp-append-version="true"></script>
+
+    <script>
+        // Sidebar toggle for mobile (Vanilla JS - không dùng jQuery)
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.getElementById('sidebar');
+
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('show');
+                });
+            }
+
+            // Close sidebar when clicking on a link (mobile)
+            const sidebarLinks = document.querySelectorAll('.sidebar-link');
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth < 576) {
+                        sidebar.classList.remove('show');
+                    }
+                });
+            });
+
+            // Check notifications with Fetch API + async/await
+            async function checkNotifications() {
+                try {
+                    const url = '@Url.Action("CheckNotifications", "Notification")';
+                    const request = new Request(url, { method: 'GET' });
+                    const response = await fetch(request);
+                    const result = await response.json();
+
+                    if (result.success && result.count > 0) {
+                        const badge = document.getElementById('notificationBadge');
+                        badge.textContent = result.count;
+                        badge.classList.remove('d-none');
+                    }
+                } catch (error) {
+                    console.error('Error checking notifications:', error);
+                }
+            }
+
+            // Initial check
+            checkNotifications();
+
+            // Check every 5 seconds (giống React useEffect interval)
+            setInterval(checkNotifications, 5000);
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

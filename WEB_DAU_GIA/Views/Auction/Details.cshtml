@@ -1,0 +1,423 @@
+﻿@using WEB_DAU_GIA.Models.ViewModels
+@model AuctionDetailsViewModel
+
+@{
+    Layout = "_DashboardLayout";
+    ViewData["Title"] = Model.Auction.Title;
+    var currentUserId = Context.Session.GetInt32("UserId");
+    var isOwner = currentUserId == Model.Auction.SellerId;
+    var isClosed = Model.Auction.Status == "closed";
+    var isWinner = Model.Auction.WinnerId == currentUserId;
+    var hasPaid = Model.Bids.Any(b => b.Status == "paid");
+}
+
+<div class="container-fluid">
+    <!-- Winner Purchase Alert -->
+    @if (isWinner && Model.Bids.Any() && !hasPaid)
+    {
+        <div class="alert alert-success border-0 shadow-sm d-flex align-items-center mb-4">
+            <i class="fas fa-trophy fa-2x text-warning me-3"></i>
+            <div class="flex-grow-1">
+                <h5 class="alert-heading mb-1">Chúc mừng! Bạn đã thắng đấu giá này!</h5>
+                <p class="mb-2">Vui lòng hoàn tất thanh toán trước hạn chót để nhận sản phẩm.</p>
+            </div>
+            <a href="@Url.Action("Checkout", "Payment", new { auctionId = Model.Auction.AuctionId, type = "AuctionPurchase" })"
+               class="btn btn-warning btn-lg">
+                <i class="fas fa-shopping-cart me-2"></i>Thanh toán ngay
+            </a>
+        </div>
+    }
+
+    <div class="row g-4">
+        <!-- Left Column - Images -->
+        <div class="col-lg-6">
+            <!-- Main Image -->
+            <div class="card border-0 shadow-sm mb-3">
+                <img src="@Model.Auction.AuctionImage"
+                     id="mainImage"
+                     class="card-img-top rounded"
+                     alt="@Model.Auction.Title"
+                     style="width: 100%; height: 400px; object-fit: cover;">
+            </div>
+
+            <!-- Additional Images -->
+            @if (Model.AuctionItems.Any())
+            {
+                <h5 class="fw-bold mb-3">Hình ảnh bổ sung</h5>
+                <div class="row g-3">
+                    @foreach (var item in Model.AuctionItems)
+                    {
+                        <div class="col-md-4 col-sm-6">
+                            <div class="card border-0 shadow-sm h-100 additional-image-card">
+                                <img src="@item.ItemImage"
+                                     class="card-img-top additional-image"
+                                     alt="@item.ItemName"
+                                     style="height: 150px; object-fit: cover; cursor: pointer;"
+                                     onclick="changeMainImage('@item.ItemImage')">
+                                <div class="card-body p-2">
+                                    <h6 class="card-title small fw-bold mb-1">@item.ItemName</h6>
+                                    @if (!string.IsNullOrEmpty(item.ItemDescription))
+                                    {
+                                        <p class="card-text small text-secondary mb-0">@item.ItemDescription</p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- Right Column - Details & Bidding -->
+        <div class="col-lg-6">
+            <!-- Auction Info Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h1 class="h2 fw-bold mb-3">@Model.Auction.Title</h1>
+
+                    <!-- Status Badge -->
+                    <div class="mb-3">
+                        <span class="badge bg-@(Model.Auction.Status == "active" ? "success" : "secondary") fs-6">
+                            <i class="fas fa-circle me-1"></i>
+                            @(Model.Auction.Status == "active" ? "Đang hoạt động" : "Đã đóng")
+                        </span>
+                        <span class="badge bg-light text-dark border fs-6 ms-2">
+                            <i class="fas fa-tag me-1"></i>@Model.Auction.AuctionCategory
+                        </span>
+                    </div>
+
+                    <!-- Description -->
+                    <p class="text-secondary mb-4">@Model.Auction.Description</p>
+
+                    <!-- Pricing Info -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <div class="p-3 bg-light rounded">
+                                <small class="text-muted d-block mb-1">Giá khởi điểm</small>
+                                <h4 class="text-success fw-bold mb-0">$@Model.Auction.StartingBid</h4>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 bg-light rounded">
+                                <small class="text-muted d-block mb-1">Giá hiện tại</small>
+                                <h4 class="text-primary fw-bold mb-0">$@Model.CurrentBid</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Date Info -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-secondary">
+                                <i class="fas fa-calendar-start me-2"></i>Ngày bắt đầu:
+                            </span>
+                            <strong>@Model.Auction.StartTime.ToString("dd/MM/yyyy HH:mm")</strong>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-secondary">
+                                <i class="fas fa-calendar-end me-2"></i>Ngày kết thúc:
+                            </span>
+                            <strong>@Model.Auction.EndTime.ToString("dd/MM/yyyy HH:mm")</strong>
+                        </div>
+                    </div>
+
+                    <!-- Countdown Timer -->
+                    @if (!isClosed && Model.Auction.Status == "active")
+                    {
+                        <div class="alert alert-warning border-0 mb-4">
+                            <h5 class="mb-2">
+                                <i class="fas fa-clock me-2"></i>Thời gian còn lại:
+                            </h5>
+                            <div class="d-flex gap-2" id="countdown">
+                                <div class="text-center flex-fill">
+                                    <div class="h3 fw-bold mb-0" id="days">0</div>
+                                    <small>Ngày</small>
+                                </div>
+                                <div class="text-center flex-fill">
+                                    <div class="h3 fw-bold mb-0" id="hours">0</div>
+                                    <small>Giờ</small>
+                                </div>
+                                <div class="text-center flex-fill">
+                                    <div class="h3 fw-bold mb-0" id="minutes">0</div>
+                                    <small>Phút</small>
+                                </div>
+                                <div class="text-center flex-fill">
+                                    <div class="h3 fw-bold mb-0" id="seconds">0</div>
+                                    <small>Giây</small>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Seller Info Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold mb-3">
+                        <i class="fas fa-user-circle me-2"></i>Thông tin người bán
+                    </h5>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <small class="text-muted">Họ tên:</small>
+                            <p class="mb-0 fw-semibold">@Model.Seller.FirstName @Model.Seller.LastName</p>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Tên đăng nhập:</small>
+                            <p class="mb-0 fw-semibold">@Model.Seller.Username</p>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Email:</small>
+                            <p class="mb-0 fw-semibold">@Model.Seller.Email</p>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Số điện thoại:</small>
+                            <p class="mb-0 fw-semibold">@Model.Seller.Mobile</p>
+                        </div>
+                        <div class="col-12">
+                            <small class="text-muted">Địa chỉ:</small>
+                            <p class="mb-0 fw-semibold">@Model.Seller.Address</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bidding Section -->
+            @if (Model.Auction.Status == "active" && !isOwner && !isClosed)
+            {
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold mb-3">
+                            <i class="fas fa-gavel me-2"></i>Đặt giá thầu
+                        </h5>
+
+                        <form id="bidForm">
+                            <div class="mb-3">
+                                <label for="bidAmount" class="form-label">Số tiền đặt giá (USD)</label>
+                                <input type="number"
+                                       class="form-control form-control-lg"
+                                       id="bidAmount"
+                                       value="@(Model.MinimumBid)"
+                                       min="@Model.MinimumBid"
+                                       step="10"
+                                       required>
+                                <small class="text-muted">
+                                    Giá thầu tối thiểu: <strong>$@Model.MinimumBid</strong> (Giá hiện tại + $10)
+                                </small>
+                            </div>
+
+                            <div id="bidError" class="alert alert-danger d-none"></div>
+                            <div id="bidSuccess" class="alert alert-success d-none"></div>
+
+                            <button type="submit" class="btn btn-primary btn-lg w-100" id="bidButton">
+                                <i class="fas fa-hand-holding-usd me-2"></i>Đặt giá thầu
+                            </button>
+                        </form>
+
+                        <div class="alert alert-info border-0 mt-3 mb-0">
+                            <small>
+                                <i class="fas fa-info-circle me-2"></i>
+                                Bạn cần thanh toán phí trước 10% giá trị đấu giá để đặt giá thầu.
+                                Giá thầu chỉ có thể tăng theo bội số $10.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Winner Info (if closed) -->
+            @if (isClosed && Model.Auction.WinnerId != null)
+            {
+                <div class="card border-0 shadow-sm bg-warning bg-opacity-10 mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-trophy fa-3x text-warning mb-3"></i>
+                        <h5 class="fw-bold mb-2">Đấu giá đã kết thúc</h5>
+                        <p class="mb-0">
+                            <strong>Người thắng:</strong> @Model.Winner?.FirstName @Model.Winner?.LastName<br>
+                            <strong>Giá thầu chiến thắng:</strong> <span class="text-success">$@Model.Auction.WinningBid</span>
+                        </p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Bids Table -->
+    <div class="card border-0 shadow-sm mt-4">
+        <div class="card-body">
+            <h5 class="card-title fw-bold mb-3">
+                <i class="fas fa-list me-2"></i>Lịch sử đặt giá (@Model.Bids.Count giá thầu)
+            </h5>
+
+            @if (Model.Bids.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Ngày & Giờ</th>
+                                <th>Người đặt giá</th>
+                                <th>Số tiền</th>
+                                <th>Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var bid in Model.Bids.OrderByDescending(b => b.CreatedAt))
+                            {
+                                <tr>
+                                    <td>
+                                        <i class="fas fa-clock me-2 text-muted"></i>
+                                        @bid.CreatedAt.ToString("dd/MM/yyyy HH:mm:ss")
+                                    </td>
+                                    <td>
+                                        @if (bid.Status == "paid")
+                                        {
+                                            <i class="fas fa-crown text-warning me-2"></i>
+                                        }
+                                        <strong>@bid.BidderName</strong>
+                                    </td>
+                                    <td class="text-success fw-bold">$@bid.BidAmount</td>
+                                    <td>
+                                        <span class="badge bg-@(bid.Status == "paid" ? "success" : bid.Status == "active" ? "primary" : "secondary")">
+                                            @(bid.Status == "paid" ? "Đã thanh toán" : bid.Status == "active" ? "Đang hoạt động" : bid.Status)
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5 text-secondary">
+                    <i class="fas fa-gavel fa-3x mb-3 opacity-25"></i>
+                    <p class="mb-0">Chưa có giá thầu nào được đặt.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Countdown Timer
+        const endTime = new Date('@Model.Auction.EndTime.ToString("yyyy-MM-ddTHH:mm:ss")').getTime();
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = endTime - now;
+
+            if (distance <= 0) {
+                document.getElementById('countdown').innerHTML = '<div class="alert alert-danger w-100">Đấu giá đã kết thúc</div>';
+                clearInterval(countdownInterval);
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById('days').textContent = days;
+            document.getElementById('hours').textContent = hours;
+            document.getElementById('minutes').textContent = minutes;
+            document.getElementById('seconds').textContent = seconds;
+        }
+
+        @if (!isClosed && Model.Auction.Status == "active")
+        {
+            <text>
+                const countdownInterval = setInterval(updateCountdown, 1000);
+                updateCountdown();
+            </text>
+        }
+
+        // Change Main Image
+        function changeMainImage(imageUrl) {
+            document.getElementById('mainImage').src = imageUrl;
+        }
+
+        // Bid Form Submission
+        const bidForm = document.getElementById('bidForm');
+        if (bidForm) {
+            bidForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const bidAmount = parseFloat(document.getElementById('bidAmount').value);
+                const minimumBid = @Model.MinimumBid;
+                const bidButton = document.getElementById('bidButton');
+                const bidError = document.getElementById('bidError');
+                const bidSuccess = document.getElementById('bidSuccess');
+
+                // Validate
+                if (bidAmount < minimumBid) {
+                    bidError.textContent = `Giá thầu phải ít nhất là $${minimumBid}`;
+                    bidError.classList.remove('d-none');
+                    bidSuccess.classList.add('d-none');
+                    return;
+                }
+
+                // Show loading
+                bidButton.disabled = true;
+                bidButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Đang xử lý...';
+
+                try {
+                    const url = '@Url.Action("PlaceBid", "Bid")';
+                    const request = new Request(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                        },
+                        body: JSON.stringify({
+                            auctionId: @Model.Auction.AuctionId,
+                            bidderId: @currentUserId,
+                            bidAmount: bidAmount,
+                            status: 'active'
+                        })
+                    });
+
+                    const response = await fetch(request);
+                    const result = await response.json();
+
+                    if (result.success) {
+                        bidSuccess.textContent = 'Đặt giá thầu thành công!';
+                        bidSuccess.classList.remove('d-none');
+                        bidError.classList.add('d-none');
+
+                        // Reload after 2 seconds
+                        setTimeout(() => {
+                            location.reload();
+                        }, 2000);
+                    } else {
+                        // Nếu cần thanh toán
+                        if (result.redirectToPayment) {
+                            window.location.href = `@Url.Action("Checkout", "Payment")?auctionId=${result.auctionId}&type=${result.type}`;
+                        } else {
+                            throw new Error(result.message || 'Đặt giá thất bại');
+                        }
+                    }
+                } catch (error) {
+                    bidError.textContent = error.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.';
+                    bidError.classList.remove('d-none');
+                    bidSuccess.classList.add('d-none');
+                } finally {
+                    bidButton.disabled = false;
+                    bidButton.innerHTML = '<i class="fas fa-hand-holding-usd me-2"></i>Đặt giá thầu';
+                }
+            });
+        }
+
+        // Additional Image Hover
+        document.querySelectorAll('.additional-image-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.05)';
+                this.style.transition = 'transform 0.3s ease';
+            });
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+}

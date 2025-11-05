@@ -1,0 +1,318 @@
+﻿@using WEB_DAU_GIA.Models.ViewModels
+@model List<MyBidViewModel>
+
+@{
+    ViewData["Title"] = "Giá thầu của tôi";
+    Layout = "_DashboardLayout";
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="mb-4">
+        <h2 class="fw-bold mb-1">
+            <i class="fas fa-gavel me-2"></i>Giá thầu của tôi
+        </h2>
+        <p class="text-secondary mb-0">Theo dõi tất cả các giá thầu bạn đã đặt</p>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-list fa-2x text-primary"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">Tổng đấu giá</h6>
+                            <h3 class="fw-bold mb-0">@Model.Count</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-trophy fa-2x text-success"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">Đang dẫn đầu</h6>
+                            <h3 class="fw-bold mb-0">@Model.Count(m => m.IsLeading)</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-warning bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-clock fa-2x text-warning"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">Đang hoạt động</h6>
+                            <h3 class="fw-bold mb-0">@Model.Count(m => m.Auction.Status == "active")</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-info bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-hand-holding-usd fa-2x text-info"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">Tổng đặt giá</h6>
+                            <h3 class="fw-bold mb-0">@Model.Sum(m => m.UserBids.Count)</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <ul class="nav nav-pills mb-4" id="statusFilter">
+        <li class="nav-item">
+            <button class="nav-link active" data-status="all">Tất cả (@Model.Count)</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" data-status="active">Đang hoạt động (@Model.Count(m => m.Auction.Status == "active"))</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" data-status="leading">Đang dẫn đầu (@Model.Count(m => m.IsLeading))</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" data-status="closed">Đã đóng (@Model.Count(m => m.Auction.Status == "closed"))</button>
+        </li>
+    </ul>
+
+    <!-- Bids List -->
+    @if (Model.Any())
+    {
+        <div id="bidsContainer">
+            @foreach (var item in Model)
+            {
+                <div class="card border-0 shadow-sm mb-3 bid-card"
+                     data-status="@item.Auction.Status"
+                     data-leading="@item.IsLeading.ToString().ToLower()">
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <!-- Image -->
+                            <div class="col-md-2">
+                                <img src="@item.Auction.AuctionImage"
+                                     class="img-fluid rounded"
+                                     alt="@item.Auction.Title"
+                                     style="width: 100%; height: 120px; object-fit: cover;">
+                            </div>
+
+                            <!-- Info -->
+                            <div class="col-md-6">
+                                <h5 class="fw-bold mb-2">
+                                    <a href="@Url.Action("Details", "Auction", new { id = item.Auction.AuctionId })"
+                                       class="text-decoration-none text-dark">
+                                        @item.Auction.Title
+                                    </a>
+                                </h5>
+                                <p class="text-secondary small mb-2">@item.Auction.Description</p>
+
+                                <div class="d-flex gap-2 mb-2">
+                                    <span class="badge bg-light text-dark border">
+                                        <i class="fas fa-tag me-1"></i>@item.Auction.AuctionCategory
+                                    </span>
+                                    <span class="badge bg-@(item.Auction.Status == "active" ? "success" : "secondary")">
+                                        @(item.Auction.Status == "active" ? "Đang hoạt động" : "Đã đóng")
+                                    </span>
+                                    @if (item.IsLeading)
+                                    {
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="fas fa-trophy me-1"></i>Đang dẫn đầu
+                                        </span>
+                                    }
+                                </div>
+
+                                <small class="text-muted">
+                                    <i class="fas fa-dollar-sign me-1"></i>
+                                    Giá khởi điểm: <strong>${@item.Auction.StartingBid}</strong>
+                                </small>
+                            </div>
+
+                            <!-- Bids History -->
+                            <div class="col-md-4">
+                                <h6 class="fw-bold mb-2">
+                                    <i class="fas fa-history me-1"></i>Lịch sử đặt giá của bạn (@item.UserBids.Count)
+                                </h6>
+                                <div class="bids-history">
+                                    @foreach (var bid in item.UserBids.OrderByDescending(b => b.CreatedAt).Take(3))
+                                    {
+                                        <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded">
+                                            <div>
+                                                <strong class="text-success">${@bid.BidAmount}</strong>
+                                                <small class="text-muted d-block">
+                                                    <i class="fas fa-clock me-1"></i>
+                                                    @bid.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                                                </small>
+                                            </div>
+                                            <span class="badge bg-@(bid.Status == "paid" ? "success" : bid.Status == "active" ? "primary" : "secondary")">
+                                                @(bid.Status == "paid" ? "Đã thanh toán" : bid.Status == "active" ? "Đang hoạt động" : bid.Status)
+                                            </span>
+                                        </div>
+                                    }
+                                    @if (item.UserBids.Count > 3)
+                                    {
+                                        <button class="btn btn-sm btn-outline-secondary w-100"
+                                                type="button"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#moreBids@(item.Auction.AuctionId)">
+                                            <i class="fas fa-chevron-down me-1"></i>Xem thêm
+                                        </button>
+                                        <div class="collapse mt-2" id="moreBids@(item.Auction.AuctionId)">
+                                            @foreach (var bid in item.UserBids.OrderByDescending(b => b.CreatedAt).Skip(3))
+                                            {
+                                                <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded">
+                                                    <div>
+                                                        <strong class="text-success">${@bid.BidAmount}</strong>
+                                                        <small class="text-muted d-block">
+                                                            <i class="fas fa-clock me-1"></i>
+                                                            @bid.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                                                        </small>
+                                                    </div>
+                                                    <span class="badge bg-@(bid.Status == "active" ? "primary" : "secondary")">
+                                                        @(bid.Status == "active" ? "Đang hoạt động" : bid.Status)
+                                                    </span>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+
+                                <a href="@Url.Action("Details", "Auction", new { id = item.Auction.AuctionId })"
+                                   class="btn btn-primary w-100 mt-3">
+                                    <i class="fas fa-eye me-2"></i>Xem chi tiết
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-gavel fa-4x text-secondary mb-3 opacity-25"></i>
+            <h4 class="text-secondary mb-3">Bạn chưa đặt giá thầu nào</h4>
+            <p class="text-muted mb-4">Tham gia đấu giá để bắt đầu đặt giá thầu</p>
+            <a href="@Url.Action("Index", "Auction")" class="btn btn-primary btn-lg">
+                <i class="fas fa-search me-2"></i>Tìm đấu giá
+            </a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // Filter functionality
+        const filterButtons = document.querySelectorAll('#statusFilter button');
+        const bidCards = document.querySelectorAll('.bid-card');
+
+        filterButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Update active button
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+
+                const status = this.dataset.status;
+
+                // Filter cards
+                bidCards.forEach(card => {
+                    const cardStatus = card.dataset.status;
+                    const isLeading = card.dataset.leading === 'true';
+
+                    if (status === 'all') {
+                        card.style.display = '';
+                    } else if (status === 'leading' && isLeading) {
+                        card.style.display = '';
+                    } else if (status === cardStatus) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Card hover animation
+        document.querySelectorAll('.bid-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateX(5px)';
+                this.style.transition = 'transform 0.3s ease';
+            });
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateX(0)';
+            });
+        });
+    </script>
+
+    <style>
+        .bid-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .bid-card:hover {
+                box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+            }
+
+        .bids-history {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+            .bids-history::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .bids-history::-webkit-scrollbar-track {
+                background: #f1f1f1;
+            }
+
+            .bids-history::-webkit-scrollbar-thumb {
+                background: #888;
+                border-radius: 3px;
+            }
+
+        .nav-pills .nav-link {
+            color: #6c757d;
+            border-radius: 50px;
+            padding: 0.5rem 1.5rem;
+            margin-right: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+            .nav-pills .nav-link:hover {
+                background-color: rgba(13, 110, 253, 0.1);
+                color: #0d6efd;
+            }
+
+            .nav-pills .nav-link.active {
+                background-color: #0d6efd;
+                color: white;
+            }
+    </style>
+}

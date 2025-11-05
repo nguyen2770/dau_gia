@@ -1,0 +1,428 @@
+﻿/* ==================== Variables ==================== */
+:root {
+    --primary-dark: #000435;
+    --primary-warning: #ffc107;
+    --sidebar-width: 256px; /* w-64 = 256px */
+    --navbar-height: 72px; /* py-4 = padding top/bottom */
+    --gray-100: #f3f4f6;
+    --gray-400: #9ca3af;
+    --gray-700: #374151;
+    --gray-900: #111827;
+}
+
+/* ==================== Global Dashboard Styles ==================== */
+.dashboard-body {
+    background-color: var(--gray-100); /* bg-gray-100 */
+    min-height: 100vh;
+    position: relative;
+}
+
+.bg-primary-dark {
+    background-color: var(--primary-dark) !important;
+}
+
+/* ==================== Top Navbar ==================== */
+.dashboard-navbar {
+    height: var(--navbar-height);
+    z-index: 1030;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    background-color: #f8fafc !important; /* bg-slate-50 */
+}
+
+/* ==================== Sidebar ==================== */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--sidebar-width);
+    height: 100vh;
+    z-index: 1040;
+    overflow-y: auto;
+    transition: transform 0.3s ease;
+}
+
+.sidebar-wrapper {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo-dot {
+    width: 20px; /* w-5 */
+    height: 20px; /* h-5 */
+}
+
+/* ==================== Sidebar Navigation ==================== */
+.sidebar-nav {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar-link {
+    color: rgba(255, 255, 255, 0.8) !important;
+    padding: 0.75rem 1rem; /* p-2 */
+    border-radius: 0.5rem; /* rounded-lg */
+    transition: all 0.3s ease;
+    text-decoration: none;
+    font-weight: 500; /* font-medium */
+}
+
+    .sidebar-link:hover,
+    .sidebar-link.active {
+        background-color: rgba(255, 255, 255, 0.1); /* hover:bg-gray-100 dark:hover:bg-gray-700 */
+        color: #fff !important;
+    }
+
+.sidebar-icon {
+    width: 20px;
+    display: inline-block;
+}
+
+.text-muted-light {
+    color: var(--gray-400);
+}
+
+/* ==================== Main Content Area ==================== */
+.main-content {
+    margin-left: var(--sidebar-width); /* sm:ml-64 */
+    margin-top: var(--navbar-height);
+    min-height: calc(100vh - var(--navbar-height));
+    padding-top: 1.25rem; /* pt-20 tailwind = 80px, we use pt-5 (3rem) */
+}
+
+/* ==================== Mobile Responsive ==================== */
+@media (max-width: 575.98px) {
+    .sidebar {
+        transform: translateX(-100%); /* -translate-x-full */
+    }
+
+        .sidebar.show {
+            transform: translateX(0);
+        }
+
+    .main-content {
+        margin-left: 0;
+    }
+
+    .dashboard-navbar h1 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (min-width: 576px) {
+    .sidebar {
+        transform: translateX(0); /* sm:translate-x-0 */
+    }
+}
+
+/* ==================== Scrollbar Styling ==================== */
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+    .sidebar::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+/* ==================== Cards & Components ==================== */
+.card {
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+    .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+    }
+
+/* ==================== Stats Cards ==================== */
+.stats-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+    .stats-card h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+
+/* ==================== Tables ==================== */
+.table {
+    background-color: white;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.table-hover tbody tr {
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 4, 53, 0.05);
+    }
+
+.table thead th {
+    border-bottom: 2px solid #e5e7eb;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    color: var(--gray-700);
+}
+
+/* ==================== Badges ==================== */
+.badge {
+    font-weight: 600;
+    padding: 0.35em 0.65em;
+    font-size: 0.75rem;
+}
+
+/* ==================== Buttons ==================== */
+.btn-primary {
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+}
+
+    .btn-primary:hover {
+        background-color: #2563eb;
+        border-color: #2563eb;
+    }
+
+.btn-success {
+    background-color: #10b981;
+    border-color: #10b981;
+}
+
+    .btn-success:hover {
+        background-color: #059669;
+        border-color: #059669;
+    }
+
+/* ==================== Loading Overlay ==================== */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.spinner-border-lg {
+    width: 3rem;
+    height: 3rem;
+    border-width: 0.3rem;
+}
+
+/* ==================== Animations ==================== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(-100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+.slide-in {
+    animation: slideIn 0.3s ease-out;
+}
+
+/* ==================== Utility Classes ==================== */
+.text-gray-400 {
+    color: var(--gray-400);
+}
+
+.text-gray-700 {
+    color: var(--gray-700);
+}
+
+.text-gray-900 {
+    color: var(--gray-900);
+}
+
+.bg-gray-100 {
+    background-color: var(--gray-100);
+}
+
+.shadow-md {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.shadow-lg {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* ==================== Responsive Text ==================== */
+@media (max-width: 768px) {
+    .h3 {
+        font-size: 1.5rem;
+    }
+}
+
+/* ==================== Auction Card Styles ==================== */
+.auction-card {
+    border-radius: 0.75rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+    .auction-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15) !important;
+    }
+
+.auction-image {
+    transition: transform 0.5s ease;
+    overflow: hidden;
+}
+
+.auction-card:hover .auction-image {
+    transform: scale(1.1);
+}
+
+/* ==================== Filter Section ==================== */
+.form-control:focus,
+.form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
+/* ==================== Badge Styles ==================== */
+.badge {
+    font-weight: 500;
+    padding: 0.35em 0.65em;
+}
+
+/* ==================== Responsive Grid ==================== */
+@media (max-width: 768px) {
+    .auction-item {
+        margin-bottom: 1rem;
+    }
+}
+
+/* ==================== Loading Animation ==================== */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.loading {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* ==================== My Auctions Styles ==================== */
+.auction-card-item {
+    transition: opacity 0.3s ease;
+}
+
+/* Live Badge Animation */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.pulse {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Status Badge Colors */
+.badge.bg-danger {
+    background-color: #dc3545 !important;
+}
+
+.badge.bg-success {
+    background-color: #28a745 !important;
+}
+
+.badge.bg-warning {
+    background-color: #ffc107 !important;
+    color: #000 !important;
+}
+
+.badge.bg-secondary {
+    background-color: #6c757d !important;
+}
+
+/* Filter Pills Hover */
+.nav-pills .nav-link {
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Statistics Cards Hover */
+.card {
+    transition: all 0.3s ease;
+}
+
+    .card:hover {
+        transform: translateY(-2px);
+    }
+
+/* Loading Overlay */
+#loadingOverlay {
+    backdrop-filter: blur(3px);
+}
+
+    #loadingOverlay .spinner-border {
+        width: 3rem;
+        height: 3rem;
+    }
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .nav-pills .nav-link {
+        font-size: 0.875rem;
+        padding: 0.4rem 1rem;
+    }
+}

@@ -1,0 +1,18 @@
+{
+  "version": "3.0",
+  "defaultProvider": "unpkg",
+  "libraries": [
+    {
+      "library": "@microsoft/signalr@9.0.6",
+      "destination": "wwwroot/lib/signalr"
+    },
+    {
+      "library": "chart.js@4.5.1",
+      "destination": "wwwroot/lib/chart.js"
+    },
+    {
+      "library": "toastr@2.1.4",
+      "destination": "wwwroot/lib/toastr"
+    }
+  ]
+}

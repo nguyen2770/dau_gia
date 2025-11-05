@@ -1,0 +1,113 @@
+﻿/* ==================== Auth Pages Styling ==================== */
+:root {
+    --primary-dark: #000435;
+    --primary-warning: #ffc107;
+}
+
+.text-primary-dark {
+    color: var(--primary-dark) !important;
+}
+
+.btn-primary-dark {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+    color: white;
+}
+
+    .btn-primary-dark:hover {
+        background-color: #000320;
+        border-color: #000320;
+        color: white;
+    }
+
+.logo-dot {
+    width: 20px;
+    height: 20px;
+}
+
+.auth-card {
+    max-width: 450px;
+    padding: 2.5rem;
+    background: white;
+}
+
+.auth-card-large {
+    max-width: 650px;
+}
+
+/* Form Controls */
+.form-control:focus {
+    border-color: var(--primary-dark);
+    box-shadow: 0 0 0 0.25rem rgba(0, 4, 53, 0.15);
+}
+
+.form-select:focus {
+    border-color: var(--primary-dark);
+    box-shadow: 0 0 0 0.25rem rgba(0, 4, 53, 0.15);
+}
+
+/* Button Hover Effect */
+.btn-hover {
+    transition: all 0.3s ease;
+}
+
+    .btn-hover:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+/* Animations */
+.animate-fade-in {
+    animation: fadeIn 0.4s ease-out;
+}
+
+.animate-slide-left {
+    animation: slideLeft 0.3s ease-out;
+}
+
+.animate-slide-right {
+    animation: slideRight 0.3s ease-out 0.1s both;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .auth-card {
+        padding: 1.5rem;
+    }
+}

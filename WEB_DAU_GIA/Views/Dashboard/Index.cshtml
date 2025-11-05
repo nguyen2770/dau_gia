@@ -1,0 +1,337 @@
+﻿@using WEB_DAU_GIA.Models.ViewModels
+@model DashboardViewModel
+
+@{
+    ViewData["Title"] = "Bảng điều khiển";
+}
+
+<div class="min-vh-100">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <p class="text-secondary mb-0">Tổng quan về hiệu suất hệ thống đấu giá của bạn</p>
+        </div>
+        <a href="@Url.Action("Create", "Auction")" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Tạo đấu giá
+        </a>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-secondary mb-3">Tổng số đấu giá</h5>
+                    <p class="display-4 text-primary fw-bold mb-0">@Model.TotalAuctions</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-secondary mb-3">Giá thầu đang hoạt động</h5>
+                    <p class="display-4 text-success fw-bold mb-0">@Model.ActiveBids</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-secondary mb-3">Thu nhập từ đấu giá</h5>
+                    <p class="display-4 text-info fw-bold mb-0">$@Model.TotalAuctionIncome</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-secondary mb-3">Đấu giá hoàn thành</h5>
+                    <p class="display-4 text-warning fw-bold mb-0">@Model.CompletedAuctions</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auction Data Section -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title fw-bold mb-4">Dữ liệu đấu giá</h5>
+            <div class="row g-4">
+                <div class="col-lg-3 col-md-6">
+                    <div class="card bg-light border-0">
+                        <div class="card-body text-center">
+                            <h6 class="fw-semibold mb-2">Đấu giá đang hoạt động</h6>
+                            <p class="h3 text-success fw-bold mb-0">@Model.ActiveAuctions</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="card bg-light border-0">
+                        <div class="card-body text-center">
+                            <h6 class="fw-semibold mb-2">Đấu giá đã đóng</h6>
+                            <p class="h3 text-danger fw-bold mb-0">@Model.ClosedAuctions</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="card bg-light border-0">
+                        <div class="card-body text-center">
+                            <h6 class="fw-semibold mb-2">Đấu giá trực tiếp</h6>
+                            <p class="h3 text-warning fw-bold mb-0">@Model.LiveAuctions</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="card bg-light border-0">
+                        <div class="card-body text-center">
+                            <h6 class="fw-semibold mb-2">Đã xóa khỏi Live</h6>
+                            <p class="h3 text-secondary fw-bold mb-0">@Model.RemovedFromLive</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold mb-3">Xu hướng đấu giá</h5>
+                    <canvas id="barChart" style="height: 300px;"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold mb-3">Danh mục đấu giá</h5>
+                    <canvas id="doughnutChart" style="height: 300px;"></canvas>
+                    @if (Model.AuctionCategories == null || !Model.AuctionCategories.Any())
+                    {
+                        <div class="text-center text-secondary">
+                            <h6>Không có dữ liệu</h6>
+                            <p>Tạo đấu giá để xem chi tiết</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Latest Auctions Overview -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title fw-bold mb-3">Tổng quan đấu giá mới nhất</h5>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Đấu giá</th>
+                            <th>Trạng thái</th>
+                            <th>Giá thầu</th>
+                            <th>Người thắng</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.AuctionOverview)
+                        {
+                            <tr>
+                                <td>
+                                    <a href="@Url.Action("Details", "Auction", new { id = item.Auction.AuctionId })" class="text-decoration-none">
+                                        <strong>@item.Auction.Title</strong>
+                                    </a>
+                                </td>
+                                <td>
+                                    <span class="badge bg-@(item.Auction.Status == "active" ? "success" : "secondary")">
+                                        @(item.Auction.Status == "active" ? "Đang hoạt động" : "Đã đóng")
+                                    </span>
+                                </td>
+                                <td>@item.BidCount</td>
+                                <td class="text-center">
+                                    @if (item.Auction.WinnerId != null)
+                                    {
+                                        <i class="fas fa-crown text-warning"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-times text-danger"></i>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <a href="@Url.Action("MyAuctions", "Auction")" class="text-decoration-none">
+                <small class="text-primary">Xem thêm...</small>
+            </a>
+        </div>
+    </div>
+
+    <!-- Recent Activities -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title fw-bold mb-3">Hoạt động gần đây</h5>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <tbody>
+                        @foreach (var activity in Model.Activities)
+                        {
+                            <tr class="activity-row">
+                                <td>
+                                    <a href="@activity.Link" class="text-decoration-none">
+                                        <div>
+                                            <strong class="activity-title">@activity.Title</strong>
+                                            <p class="mb-1 small">@activity.Message</p>
+                                            <small class="text-muted">@activity.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
+                                        </div>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <a href="@Url.Action("Index", "Notification")" class="text-decoration-none">
+                <small class="text-primary">Xem thêm...</small>
+            </a>
+        </div>
+    </div>
+
+    <!-- Paid Auctions -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title fw-bold mb-3">Đấu giá đã thanh toán</h5>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Đấu giá</th>
+                            <th>Trạng thái</th>
+                            <th>Giá thầu chiến thắng</th>
+                            <th>Người thắng</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.PaidAuctions)
+                        {
+                            <tr>
+                                <td>
+                                    <a href="@Url.Action("Details", "Auction", new { id = item.Auction.AuctionId })" class="text-decoration-none">
+                                        <strong>@item.Auction.Title</strong>
+                                    </a>
+                                </td>
+                                <td>
+                                    <span class="badge bg-@(item.Auction.Status == "active" ? "success" : "secondary")">
+                                        @(item.Auction.Status == "active" ? "Đang hoạt động" : "Đã đóng")
+                                    </span>
+                                </td>
+                                <td>$@item.WinningBid.BidAmount</td>
+                                <td>@item.WinningBid.BidderName</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Category colors mapping
+        const categoryColors = {
+            'Art and Antiques': '#8B4513',
+            'Fashion and Accessories': '#E91E63',
+            'Home and Garden': '#4CAF50',
+            'Electronics and Gadgets': '#00BCD4',
+            'Vehicles': '#FF5722',
+            'Collectibles': '#9C27B0',
+            'Sports and Outdoors': '#009688',
+            'Toys and Games': '#FFEB3B',
+            'Books and Media': '#795548',
+            'Photography': '#607D8B',
+            'Crafts and Hobbies': '#FFC107',
+            'Real Estate': '#3F51B5',
+            'Wine and Spirits': '#8D2828',
+            'Tickets and Experiences': '#FF9800',
+            'Health and Beauty': '#E91E63'
+        };
+
+        // Bar Chart - Auction Trends
+        const barCtx = document.getElementById('barChart');
+        if (barCtx) {
+            const barData = @Html.Raw(Json.Serialize(Model.AuctionTrends));
+            new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: barData.map(d => d.category),
+                    datasets: [{
+                        label: 'Số lượng',
+                        data: barData.map(d => d.count),
+                        backgroundColor: barData.map(d => categoryColors[d.category] || '#000000'),
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        // Doughnut Chart - Auction Categories
+        const doughnutCtx = document.getElementById('doughnutChart');
+        if (doughnutCtx) {
+            const categoryData = @Html.Raw(Json.Serialize(Model.AuctionCategories));
+            if (categoryData && categoryData.length > 0) {
+                new Chart(doughnutCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: categoryData.map(d => d.category),
+                        datasets: [{
+                            data: categoryData.map(d => d.count),
+                            backgroundColor: categoryData.map(d => categoryColors[d.category] || '#000000'),
+                            hoverOffset: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+        }
+
+        // Activity row hover effect
+        document.querySelectorAll('.activity-row').forEach(row => {
+            row.addEventListener('mouseenter', function() {
+                this.querySelector('.activity-title').classList.add('text-primary');
+            });
+            row.addEventListener('mouseleave', function() {
+                this.querySelector('.activity-title').classList.remove('text-primary');
+            });
+        });
+    </script>
+
+    <style>
+        .activity-row {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+            .activity-row:hover {
+                background-color: rgba(0, 123, 255, 0.05);
+            }
+
+        .activity-title {
+            transition: color 0.2s;
+        }
+    </style>
+}

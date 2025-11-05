@@ -1,0 +1,167 @@
+﻿@using WEB_DAU_GIA.Models.ViewModels
+@model SignupViewModel
+
+@{
+    ViewData["Title"] = "Đăng ký";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - BidOut</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+</head>
+<body class="bg-white">
+    <div class="d-flex align-items-center justify-content-center min-vh-100 p-4">
+        <div class="auth-card auth-card-large shadow-lg rounded-3 animate-fade-in">
+            <!-- Logo Header -->
+            <div class="text-center mb-4">
+                <div class="d-inline-flex align-items-center">
+                    <div class="logo-dot bg-warning rounded-circle me-2"></div>
+                    <h2 class="h3 mb-0 fw-bold">
+                        <span class="text-warning">Bid</span><span class="text-primary-dark">Out</span>
+                    </h2>
+                </div>
+                <p class="text-secondary mt-2 mb-0">Tạo tài khoản mới</p>
+            </div>
+
+            <!-- Alert Message -->
+            @if (!string.IsNullOrEmpty(ViewBag.Message))
+            {
+                <div class="alert alert-@(ViewBag.MessageOk ? "success" : "danger") alert-dismissible fade show" role="alert">
+                    <i class="fas fa-@(ViewBag.MessageOk ? "check-circle" : "exclamation-triangle") me-2"></i>
+                    @ViewBag.Message
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <form asp-action="Signup" asp-controller="Account" method="post" id="signupForm">
+                @Html.AntiForgeryToken()
+
+                <!-- Name Fields -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label for="firstName" class="form-label fw-medium text-secondary">Họ</label>
+                        <input asp-for="FirstName" type="text" class="form-control" id="firstName" placeholder="Nhập họ" required />
+                        <span asp-validation-for="FirstName" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="lastName" class="form-label fw-medium text-secondary">Tên</label>
+                        <input asp-for="LastName" type="text" class="form-control" id="lastName" placeholder="Nhập tên" required />
+                        <span asp-validation-for="LastName" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <!-- Email & Username -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label for="email" class="form-label fw-medium text-secondary">Email</label>
+                        <input asp-for="Email" type="email" class="form-control" id="email" placeholder="example@email.com" required />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="username" class="form-label fw-medium text-secondary">Tên đăng nhập</label>
+                        <input asp-for="Username" type="text" class="form-control" id="username" placeholder="Chọn tên đăng nhập" required />
+                        <span asp-validation-for="Username" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <!-- Gender & Mobile -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label for="gender" class="form-label fw-medium text-secondary">Giới tính</label>
+                        <select asp-for="Gender" class="form-select" id="gender" required>
+                            <option value="">Chọn giới tính</option>
+                            <option value="male">Nam</option>
+                            <option value="female">Nữ</option>
+                            <option value="other">Khác</option>
+                        </select>
+                        <span asp-validation-for="Gender" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="mobile" class="form-label fw-medium text-secondary">Số điện thoại</label>
+                        <input asp-for="Mobile" type="tel" class="form-control" id="mobile" placeholder="0123456789" pattern="[0-9]{10}" required />
+                        <span asp-validation-for="Mobile" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <!-- Address -->
+                <div class="mb-3">
+                    <label for="address" class="form-label fw-medium text-secondary">Địa chỉ</label>
+                    <input asp-for="Address" type="text" class="form-control" id="address" placeholder="Nhập địa chỉ của bạn" required />
+                    <span asp-validation-for="Address" class="text-danger small"></span>
+                </div>
+
+                <!-- Password Fields -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label for="password" class="form-label fw-medium text-secondary">Mật khẩu</label>
+                        <input asp-for="Password" type="password" class="form-control" id="password" placeholder="Nhập mật khẩu" required />
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="confirmPassword" class="form-label fw-medium text-secondary">Xác nhận mật khẩu</label>
+                        <input asp-for="ConfirmPassword" type="password" class="form-control" id="confirmPassword" placeholder="Nhập lại mật khẩu" required />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <!-- Terms & Conditions -->
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="terms" required />
+                    <label class="form-check-label small text-secondary" for="terms">
+                        Tôi đồng ý với <a href="#" class="text-primary-dark">Điều khoản dịch vụ</a> và <a href="#" class="text-primary-dark">Chính sách bảo mật</a>
+                    </label>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary-dark btn-lg w-100 mb-3 btn-hover">
+                    <i class="fas fa-user-plus me-2"></i>Đăng ký
+                </button>
+
+                <!-- Login Link -->
+                <div class="text-center">
+                    <span class="text-secondary small">Đã có tài khoản?</span>
+                    <a href="@Url.Action("Login", "Account")" class="text-primary-dark fw-semibold small text-decoration-none">
+                        Đăng nhập ngay
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Password validation
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const mobile = document.getElementById('mobile').value;
+
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                alert('Mật khẩu xác nhận không khớp!');
+                return false;
+            }
+
+            if (mobile.length !== 10) {
+                e.preventDefault();
+                alert('Số điện thoại phải có 10 chữ số!');
+                return false;
+            }
+
+            // Show loading
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Đang xử lý...';
+        });
+    </script>
+</body>
+</html>

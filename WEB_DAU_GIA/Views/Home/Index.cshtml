@@ -1,0 +1,239 @@
+﻿@{
+    ViewData["Title"] = "Trang chủ";
+}
+
+<div class="min-vh-100 bg-light">
+    <!-- Hero Section -->
+    <header class="text-center py-5 bg-white shadow-sm">
+        <div class="container">
+            <h1 class="display-3 fw-bold animate-fade-in">
+                Khám phá
+                <span class="d-inline-flex align-items-center ms-2">
+                    <span class="text-warning">Bid</span><span>Out</span>
+                </span>
+            </h1>
+            <p class="lead text-secondary mt-3 animate-fade-in-delay">
+                Nền tảng đấu giá toàn cầu an toàn và đáng tin cậy
+            </p>
+        </div>
+    </header>
+
+    <!-- Auction Process Section -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <h2 class="display-5 fw-semibold text-center mb-4 text-primary-dark">
+                Quy trình đấu giá của chúng tôi hoạt động như thế nào
+            </h2>
+            <p class="lead text-center text-secondary mb-5">
+                Quy trình đấu giá của chúng tôi được thiết kế đơn giản và thân thiện với người dùng. Đây là cách hoạt động:
+            </p>
+
+            <div class="row g-4">
+                @{
+                    var steps = new[] {
+                new { Step = "1. Đăng ký", Description = "Tạo tài khoản với chúng tôi để bắt đầu tham gia đấu giá. Đăng ký miễn phí và chỉ mất vài phút.", Icon = "fa-user-plus", Color = "primary" },
+                new { Step = "2. Duyệt đấu giá", Description = "Khám phá danh sách đấu giá đang hoạt động của chúng tôi và tìm các mặt hàng bạn quan tâm.", Icon = "fa-search", Color = "info" },
+                new { Step = "3. Đặt giá thầu", Description = "Để đặt giá thầu, bạn phải trả trước phí 10% giá trị đấu giá. Giá thầu chỉ có thể tăng theo bội số $10.", Icon = "fa-hand-holding-dollar", Color = "success" },
+                new { Step = "4. Người chiến thắng", Description = "Nếu bạn có giá thầu cao nhất khi đấu giá kết thúc, bạn thắng! Bạn có 24 giờ để hoàn tất thanh toán.", Icon = "fa-trophy", Color = "warning" },
+                new { Step = "5. Hoàn tất thanh toán", Description = "Làm theo hướng dẫn thanh toán để hoàn tất giao dịch. Phí trả trước sẽ được hoàn lại sau khi thanh toán thành công.", Icon = "fa-credit-card", Color = "danger" },
+                new { Step = "6. Tận hưởng sản phẩm!", Description = "Sau khi thanh toán được xác nhận, tận hưởng sản phẩm mới của bạn. Chúng tôi sẽ giao hàng trực tiếp đến tận nhà!", Icon = "fa-box-open", Color = "secondary" }
+                };
+                }
+
+                @foreach (var item in steps)
+                {
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card border-0 shadow-sm h-100 card-hover animate-slide-up">
+                            <div class="card-body text-center p-4">
+                                <div class="mb-4">
+                                    <i class="fas @item.Icon fa-3x text-@item.Color"></i>
+                                </div>
+                                <h5 class="card-title fw-bold mb-3">@item.Step</h5>
+                                <p class="card-text text-secondary">@item.Description</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="alert alert-info mt-5 text-center border-0 shadow-sm">
+                <p class="lead mb-2">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Lưu ý: Nếu thanh toán không được hoàn tất trong vòng 24 giờ sau khi thắng, giá thầu của bạn sẽ bị hủy và người đặt giá cao thứ hai sẽ được thông báo.
+                </p>
+                <p class="mb-0 fw-semibold">
+                    Tham gia cùng chúng tôi ngay hôm nay và bắt đầu giành chiến thắng các sản phẩm thú vị!
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-5 bg-white">
+        <div class="container">
+            <h2 class="display-5 fw-semibold text-center mb-5">
+                Tại sao chọn chúng tôi
+            </h2>
+            <div class="row g-4">
+                @{
+                    var features = new[] {
+                new { Title = "Đấu giá an toàn", Description = "Bảo mật hàng đầu đảm bảo giá thầu của bạn an toàn và đáng tin cậy.", Icon = "fa-lock", Color = "primary" },
+                new { Title = "Giao dịch nhanh", Description = "Trải nghiệm giao dịch tức thì và mượt mà không có độ trễ.", Icon = "fa-bolt", Color = "warning" },
+                new { Title = "Hỗ trợ 24/7", Description = "Đội ngũ hỗ trợ của chúng tôi luôn sẵn sàng hỗ trợ bạn.", Icon = "fa-headset", Color = "success" },
+                new { Title = "Đấu giá toàn cầu", Description = "Truy cập đấu giá từ khắp nơi trên thế giới một cách dễ dàng.", Icon = "fa-globe", Color = "info" }
+                };
+                }
+
+                @foreach (var feature in features)
+                {
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card border-0 shadow-sm h-100 text-center card-hover">
+                            <div class="card-body p-4">
+                                <div class="mb-4">
+                                    <i class="fas @feature.Icon fa-3x text-@feature.Color"></i>
+                                </div>
+                                <h5 class="card-title fw-bold mb-3">@feature.Title</h5>
+                                <p class="card-text text-secondary">@feature.Description</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <h2 class="display-5 fw-semibold text-center mb-5">
+                Người dùng nói gì về chúng tôi
+            </h2>
+            <div class="row g-4">
+                @{
+                    var testimonials = new[] {
+                new { Name = "Nguyễn Văn An", Feedback = "BidOut là nền tảng đấu giá tốt nhất cho đến nay. Tôi đã giành được những món đồ tuyệt vời và quy trình rất mượt mà." },
+                new { Name = "Trần Thị Bình", Feedback = "Chuyên nghiệp, an toàn và dễ sử dụng. BidOut vượt quá mong đợi của tôi với giao diện sạch sẽ." },
+                new { Name = "Lê Minh Cường", Feedback = "Trải nghiệm tuyệt vời từ đầu đến cuối. Giao dịch nhanh và hỗ trợ khách hàng xuất sắc." }
+                };
+                }
+
+                @foreach (var testimonial in testimonials)
+                {
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card border-0 shadow-sm h-100 card-hover">
+                            <div class="card-body p-4">
+                                <p class="fst-italic text-secondary mb-3">
+                                    <i class="fas fa-quote-left me-2"></i>
+                                    @testimonial.Feedback
+                                </p>
+                                <p class="fw-bold text-primary-dark mb-0">
+                                    - @testimonial.Name
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+
+    <!-- Auction Process Overview -->
+    <section class="py-5 bg-light-blue">
+        <div class="container">
+            <h2 class="display-5 fw-semibold text-center mb-5">
+                Quy trình đấu giá
+            </h2>
+            <div class="row g-4">
+                @{
+                    var processSteps = new[] {
+                new { Title = "Đăng ký", Description = "Tạo tài khoản để bắt đầu đấu giá các mặt hàng yêu thích.", Icon = "fa-user-plus" },
+                new { Title = "Duyệt đấu giá", Description = "Khám phá các cuộc đấu giá khác nhau và tìm mặt hàng bạn muốn.", Icon = "fa-search" },
+                new { Title = "Đặt giá thầu", Description = "Gửi giá thầu của bạn và cạnh tranh với các người đấu giá khác.", Icon = "fa-gavel" },
+                new { Title = "Thắng & Thanh toán", Description = "Nếu bạn thắng, hoàn tất thanh toán dễ dàng thông qua nền tảng của chúng tôi.", Icon = "fa-shopping-cart" }
+                };
+                }
+
+                @foreach (var step in processSteps)
+                {
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card border-0 shadow-sm h-100 text-center card-hover-scale">
+                            <div class="card-body p-4">
+                                <div class="mb-3">
+                                    <i class="fas @step.Icon fa-3x text-primary"></i>
+                                </div>
+                                <h5 class="card-title fw-bold mb-3">@step.Title</h5>
+                                <p class="card-text text-secondary">@step.Description</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Styles {
+    <style>
+        .text-primary-dark {
+            color: #000435 !important;
+        }
+
+        .bg-light-blue {
+            background-color: #f8f9fa;
+        }
+
+        /* Animations */
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .animate-fade-in-delay {
+            animation: fadeIn 0.6s ease-out 0.2s both;
+        }
+
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @@keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+
+            .card-hover:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+            }
+
+        .card-hover-scale {
+            transition: transform 0.3s ease;
+        }
+
+            .card-hover-scale:hover {
+                transform: scale(1.05);
+            }
+    </style>
+}

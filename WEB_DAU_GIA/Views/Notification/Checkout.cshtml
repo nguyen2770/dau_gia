@@ -1,0 +1,62 @@
+﻿@{
+    ViewData["Title"] = "Thanh toán";
+    var auction = ViewBag.Auction;
+    var amount = (decimal)ViewBag.Amount;
+    var type = (string)ViewBag.Type;
+    var auctionId = (int)ViewBag.AuctionId;
+}
+<h2>Thanh toán cho đấu giá: @auction.Title</h2>
+<p>Số tiền cần thanh toán: <strong>$@amount</strong></p>
+<form id="payment-form">
+    <input type="hidden" id="auctionId" value="@auctionId" />
+    <input type="hidden" id="type" value="@type" />
+    <input type="hidden" id="amount" value="@amount" />
+    <!-- Stripe Card Element -->
+    <div id="card-element"></div>
+    <button id="pay-btn" type="submit">Thanh toán</button>
+</form>
+<div id="payment-result"></div>
+@section Scripts {
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        const stripe = Stripe('@YourPublishableKey');
+        const elements = stripe.elements();
+        const card = elements.create('card');
+        card.mount('#card-element');
+
+        const paymentForm = document.getElementById('payment-form');
+        paymentForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const auctionId = document.getElementById('auctionId').value;
+            const type = document.getElementById('type').value;
+            const amount = document.getElementById('amount').value;
+
+            // Tạo PaymentIntent trên server
+            const resp = await fetch('/api/payments/check', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ AuctionId: auctionId, Type: type, UserId: @HttpContext.Session.GetInt32("UserId"), Amount: amount })
+            });
+            const data = await resp.json();
+            if (!data.clientSecret) {
+                document.getElementById('payment-result').innerText = "Không thể tạo PaymentIntent!";
+                return;
+            }
+            // Xác nhận thanh toán với Stripe
+            const result = await stripe.confirmCardPayment(data.clientSecret, {
+                payment_method: { card: card }
+            });
+            if (result.error) {
+                document.getElementById('payment-result').innerText = result.error.message;
+            } else if (result.paymentIntent.status === 'succeeded') {
+                // Gọi API tạo payment thực trong hệ thống
+                await fetch('/api/payments/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ AuctionId: auctionId, Type: type, UserId: @HttpContext.Session.GetInt32("UserId"), Amount: amount })
+                });
+                window.location.href = "/MyPayments"; // hoặc về trang cảm ơn
+            }
+        });
+    </script>
+}

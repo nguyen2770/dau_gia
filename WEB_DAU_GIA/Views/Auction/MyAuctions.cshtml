@@ -1,0 +1,374 @@
+﻿@using WEB_DAU_GIA.Models.ViewModels
+@model List<MyAuctionViewModel>
+
+@{
+    ViewData["Title"] = "Đấu giá của tôi";
+    Layout = "_DashboardLayout";
+}
+
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Đấu giá của tôi</h2>
+            <p class="text-secondary mb-0">Quản lý tất cả các đấu giá bạn đã tạo</p>
+        </div>
+        <a href="@Url.Action("Create", "Auction")" class="btn btn-primary btn-lg">
+            <i class="fas fa-plus me-2"></i>Tạo đấu giá mới
+        </a>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-gavel fa-2x text-primary"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">Tổng đấu giá</h6>
+                            <h3 class="fw-bold mb-0">@Model.Count</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-check-circle fa-2x text-success"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">Đang hoạt động</h6>
+                            <h3 class="fw-bold mb-0">@Model.Count(a => a.DisplayStatus == "active")</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-warning bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-clock fa-2x text-warning"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">Chờ duyệt</h6>
+                            <h3 class="fw-bold mb-0">@Model.Count(a => a.DisplayStatus == "pending")</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-danger bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-times-circle fa-2x text-danger"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1">Đã đóng</h6>
+                            <h3 class="fw-bold mb-0">@Model.Count(a => a.DisplayStatus == "closed")</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <ul class="nav nav-pills mb-4" id="statusFilter">
+        <li class="nav-item">
+            <button class="nav-link active" data-status="all">Tất cả (@Model.Count)</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" data-status="active">Đang hoạt động (@Model.Count(a => a.DisplayStatus == "active"))</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" data-status="pending">Chờ duyệt (@Model.Count(a => a.DisplayStatus == "pending"))</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" data-status="closed">Đã đóng (@Model.Count(a => a.DisplayStatus == "closed"))</button>
+        </li>
+    </ul>
+
+    <!-- Auctions Grid -->
+    @if (Model.Any())
+    {
+        <div class="row g-4" id="auctionsGrid">
+            @foreach (var auction in Model)
+            {
+                <div class="col-lg-4 col-md-6 auction-card-item" data-status="@auction.DisplayStatus">
+                    <div class="card border-0 shadow-sm h-100 auction-card">
+                        <!-- Image with Live Badge -->
+                        <div class="position-relative">
+                            <img src="@auction.AuctionImage"
+                                 class="card-img-top"
+                                 alt="@auction.Title"
+                                 style="height: 200px; object-fit: cover;">
+
+                            @if (auction.IsLive == "yes")
+                            {
+                                <span class="position-absolute top-0 end-0 m-2 badge bg-danger">
+                                    <i class="fas fa-circle pulse me-1"></i>LIVE
+                                </span>
+                            }
+
+                            <span class="position-absolute top-0 start-0 m-2 badge bg-@(auction.DisplayStatus == "active" ? "success" : auction.DisplayStatus == "pending" ? "warning" : "secondary")">
+                                @(auction.DisplayStatus == "active" ? "Đang hoạt động" : auction.DisplayStatus == "pending" ? "Chờ duyệt" : "Đã đóng")
+                            </span>
+                        </div>
+
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title fw-bold mb-2">@auction.Title</h5>
+                            <p class="card-text text-secondary small mb-3 flex-grow-1">
+                                @(auction.Description.Length > 80 ? auction.Description.Substring(0, 80) + "..." : auction.Description)
+                            </p>
+
+                            <!-- Auction Info -->
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <small class="text-muted">Giá khởi điểm:</small>
+                                    <strong class="text-success">$@auction.StartingBid</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <small class="text-muted">Danh mục:</small>
+                                    <strong>@auction.AuctionCategory</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <small class="text-muted">Ngày bắt đầu:</small>
+                                    <strong>@auction.StartTime.ToString("dd/MM/yyyy")</strong>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <small class="text-muted">Ngày kết thúc:</small>
+                                    <strong>@auction.EndTime.ToString("dd/MM/yyyy")</strong>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="btn-group w-100 mb-2">
+                                <a href="@Url.Action("Details", "Auction", new { id = auction.AuctionId })"
+                                   class="btn btn-outline-primary">
+                                    <i class="fas fa-eye me-1"></i>Xem
+                                </a>
+
+                                @if (auction.IsLive == "no" && auction.DisplayStatus == "active")
+                                {
+                                    <button class="btn btn-outline-success"
+                                            onclick="updateStatus(@auction.AuctionId, 'yes')">
+                                        <i class="fas fa-play me-1"></i>Thêm vào Live
+                                    </button>
+                                }
+
+                                @if (auction.IsLive == "yes")
+                                {
+                                    <button class="btn btn-outline-danger"
+                                            onclick="updateStatus(@auction.AuctionId, 'no')">
+                                        <i class="fas fa-stop me-1"></i>Xóa khỏi Live
+                                    </button>
+                                }
+                            </div>
+
+                            @if (auction.DisplayStatus == "pending")
+                            {
+                                <small class="text-warning">
+                                    <i class="fas fa-info-circle me-1"></i>Đấu giá đang chờ được phê duyệt
+                                </small>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-gavel fa-4x text-secondary mb-3 opacity-25"></i>
+            <h4 class="text-secondary mb-3">Bạn chưa có đấu giá nào</h4>
+            <p class="text-muted mb-4">Tạo đấu giá đầu tiên của bạn để bắt đầu</p>
+            <a href="@Url.Action("Create", "Auction")" class="btn btn-primary btn-lg">
+                <i class="fas fa-plus me-2"></i>Tạo đấu giá mới
+            </a>
+        </div>
+    }
+</div>
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="d-none">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Đang tải...</span>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Filter by status
+        const filterButtons = document.querySelectorAll('#statusFilter button');
+        const auctionItems = document.querySelectorAll('.auction-card-item');
+
+        filterButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Update active button
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+
+                const status = this.dataset.status;
+
+                // Filter items
+                auctionItems.forEach(item => {
+                    if (status === 'all' || item.dataset.status === status) {
+                        item.style.display = '';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Update auction status (Add to Live / Remove from Live)
+        async function updateStatus(auctionId, isLive) {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.classList.remove('d-none');
+
+            try {
+                const url = '@Url.Action("UpdateStatus", "Auction")';
+                const request = new Request(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': '@Html.AntiForgeryToken()'
+                    },
+                    body: JSON.stringify({
+                        auctionId: auctionId,
+                        isLive: isLive
+                    })
+                });
+
+                const response = await fetch(request);
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast('Cập nhật thành công!', 'success');
+                    // setTimeout(() => {
+                    //     location.reload();
+                    // }, 1000);
+                        const card = document.querySelector(`[onclick*="updateStatus(${auctionId}"]`).closest('.auction-card-item');
+        const statusBadge = card.querySelector('.badge.bg-success, .badge.bg-warning, .badge.bg-secondary');
+        const liveBtn = card.querySelector('.btn-outline-success, .btn-outline-danger');
+
+        if (isLive === 'yes') {
+            statusBadge.insertAdjacentHTML('beforebegin', `<span class="position-absolute top-0 end-0 m-2 badge bg-danger"><i class="fas fa-circle pulse me-1"></i>LIVE</span>`);
+            liveBtn.outerHTML = `<button class="btn btn-outline-danger" onclick="updateStatus(${auctionId}, 'no')"><i class="fas fa-stop me-1"></i>Xóa khỏi Live</button>`;
+        } else {
+            const liveBadge = card.querySelector('.badge.bg-danger');
+            if (liveBadge) liveBadge.remove();
+            liveBtn.outerHTML = `<button class="btn btn-outline-success" onclick="updateStatus(${auctionId}, 'yes')"><i class="fas fa-play me-1"></i>Thêm vào Live</button>`;
+        }
+                } else {
+                    showToast(result.message || 'Cập nhật thất bại', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Đã có lỗi xảy ra', 'error');
+            } finally {
+                loadingOverlay.classList.add('d-none');
+            }
+        }
+
+        // Toast notification
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed top-0 end-0 m-3`;
+            toast.style.zIndex = '9999';
+            toast.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+                ${message}
+            `;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Card hover animation
+        document.querySelectorAll('.auction-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+                this.style.transition = 'transform 0.3s ease';
+            });
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Pulse animation for LIVE badge
+        const style = document.createElement('style');
+        style.textContent = `
+            @@keyframes pulse {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.5; }
+            }
+            .pulse {
+                animation: pulse 1.5s ease-in-out infinite;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+
+    <style>
+        .auction-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .auction-card:hover {
+                box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15) !important;
+            }
+
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .nav-pills .nav-link {
+            color: #6c757d;
+            border-radius: 50px;
+            padding: 0.5rem 1.5rem;
+            margin-right: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+            .nav-pills .nav-link:hover {
+                background-color: rgba(13, 110, 253, 0.1);
+                color: #0d6efd;
+            }
+
+            .nav-pills .nav-link.active {
+                background-color: #0d6efd;
+                color: white;
+            }
+    </style>
+}

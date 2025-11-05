@@ -1,0 +1,218 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - BidOut</title>
+
+    <!-- Bootstrap 5 CSS từ lib -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    @RenderSection("Styles", required: false)
+
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary-custom shadow-lg position-relative" style="z-index: 50;">
+        <div class="container-fluid px-3 px-lg-4">
+            <!-- Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="@Url.Action("Index", "Home")">
+                <div class="logo-dot bg-warning rounded-circle me-2"></div>
+                <span class="text-warning fw-bold fs-4">Bid</span><span class="text-white fw-bold fs-4">Out</span>
+            </a>
+
+            <!-- Mobile Toggle Button -->
+            <button class="navbar-toggler border-0 p-2" type="button" id="navbarToggler" aria-label="Toggle navigation">
+                <i class="fas fa-bars text-white" id="toggleIcon"></i>
+            </button>
+
+            <!-- Desktop Navigation Links -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+                    <li class="nav-item">
+                        <a class="nav-link nav-hover fw-medium" href="@Url.Action("Index", "Home")">Home</a>
+                    </li>
+
+                    @if (Context.Session.GetInt32("UserId") != null)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link nav-hover fw-medium" href="@Url.Action("Index", "Dashboard")">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link nav-hover fw-medium" href="@Url.Action("Logout", "Account")">Logout</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link nav-hover fw-medium" href="@Url.Action("Login", "Account")">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link nav-hover fw-medium" href="@Url.Action("Signup", "Account")">Signup</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+
+            <!-- Mobile Menu (Custom Dropdown) -->
+            <div class="mobile-menu position-absolute w-100 top-100 start-0 bg-primary-custom overflow-hidden" id="mobileMenu" style="max-height: 0; transition: max-height 0.5s ease;">
+                <div class="px-2 py-3">
+                    <a href="@Url.Action("Index", "Home")" class="d-block px-3 py-2 rounded text-white text-decoration-none mobile-link mb-2">
+                        Home
+                    </a>
+                    @if (Context.Session.GetInt32("UserId") != null)
+                    {
+                        <a href="@Url.Action("Index", "Dashboard")" class="d-block px-3 py-2 rounded text-white text-decoration-none mobile-link mb-2">
+                            Dashboard
+                        </a>
+                        <a href="@Url.Action("Logout", "Account")" class="d-block px-3 py-2 rounded text-white text-decoration-none mobile-link mb-2">
+                            Logout
+                        </a>
+                    }
+                    else
+                    {
+                        <a href="@Url.Action("Login", "Account")" class="d-block px-3 py-2 rounded text-white text-decoration-none mobile-link mb-2">
+                            Login
+                        </a>
+                        <a href="@Url.Action("Signup", "Account")" class="d-block px-3 py-2 rounded text-white text-decoration-none mobile-link mb-2">
+                            Signup
+                        </a>
+                    }
+                    <a href="@Url.Action("Index", "Auction")" class="d-block px-3 py-2 rounded text-white text-decoration-none mobile-link">
+                        Auctions
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow-1">
+        @RenderBody()
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-primary-custom text-white py-5 mt-auto">
+        <div class="container">
+            <div class="row g-4">
+                <!-- Brand Section -->
+                <div class="col-lg-3 col-md-6 mb-3 mb-lg-0">
+                    <h2 class="h4 fw-bold mb-3">
+                        <span class="text-warning">Bid</span>Out
+                    </h2>
+                    <p class="text-light-muted">
+                        Best Auction Market. Join us to explore more!
+                    </p>
+                </div>
+
+                <!-- Company Links -->
+                <div class="col-lg-3 col-md-6 mb-3 mb-lg-0">
+                    <h5 class="fw-semibold mb-3 text-center text-md-start">Company</h5>
+                    <ul class="list-unstyled d-flex flex-column flex-md-row justify-content-center justify-content-md-start gap-2 gap-md-3">
+                        <li>
+                            <a href="@Url.Action("Index", "Home")" class="text-decoration-none text-light-muted footer-link">Home</a>
+                        </li>
+                        <li>
+                            <a href="@Url.Action("Login", "Account")" class="text-decoration-none text-light-muted footer-link">Login</a>
+                        </li>
+                        <li>
+                            <a href="@Url.Action("Signup", "Account")" class="text-decoration-none text-light-muted footer-link">Sign Up</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Support Links -->
+                <div class="col-lg-3 col-md-6 mb-3 mb-lg-0">
+                    <h5 class="fw-semibold mb-3 text-center text-md-start">Support</h5>
+                    <ul class="list-unstyled d-flex flex-column flex-md-row justify-content-center justify-content-md-start gap-2 gap-md-3">
+                        <li>
+                            <a href="@Url.Action("HelpCenter", "Home")" class="text-decoration-none text-light-muted footer-link">Help Center</a>
+                        </li>
+                        <li>
+                            <a href="@Url.Action("ContactUs", "Home")" class="text-decoration-none text-light-muted footer-link">Contact Us</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Social Media -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="d-flex justify-content-center justify-content-lg-start gap-3 flex-wrap">
+                        <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="text-white social-icon">
+                            <i class="fab fa-facebook fa-2x"></i>
+                        </a>
+                        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" class="text-white social-icon">
+                            <i class="fab fa-twitter fa-2x"></i>
+                        </a>
+                        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="text-white social-icon">
+                            <i class="fab fa-instagram fa-2x"></i>
+                        </a>
+                        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="text-white social-icon">
+                            <i class="fab fa-linkedin fa-2x"></i>
+                        </a>
+                        <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="text-white social-icon">
+                            <i class="fab fa-github fa-2x"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="row mt-4 pt-4 border-top border-secondary">
+                <div class="col text-center text-light-muted">
+                    <p class="mb-0">&copy; @DateTime.Now.Year BidOut. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS từ lib -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        // Mobile menu toggle (không dùng jQuery, dùng vanilla JS)
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggler = document.getElementById('navbarToggler');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const toggleIcon = document.getElementById('toggleIcon');
+            let isOpen = false;
+
+            if (toggler) {
+                toggler.addEventListener('click', function() {
+                    isOpen = !isOpen;
+
+                    if (isOpen) {
+                        mobileMenu.style.maxHeight = '500px';
+                        toggleIcon.classList.remove('fa-bars');
+                        toggleIcon.classList.add('fa-xmark');
+                    } else {
+                        mobileMenu.style.maxHeight = '0';
+                        toggleIcon.classList.remove('fa-xmark');
+                        toggleIcon.classList.add('fa-bars');
+                    }
+                });
+            }
+
+            // Close mobile menu when clicking on a link
+            const mobileLinks = document.querySelectorAll('.mobile-link');
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    mobileMenu.style.maxHeight = '0';
+                    toggleIcon.classList.remove('fa-xmark');
+                    toggleIcon.classList.add('fa-bars');
+                    isOpen = false;
+                });
+            });
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
